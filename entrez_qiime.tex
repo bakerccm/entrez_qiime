@@ -1,0 +1,170 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=0.8in, bottom=1.03in, footskip = 0.4in]{geometry}
+\geometry{letterpaper}
+\usepackage[parfill]{parskip}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+
+\usepackage{longtable}
+\usepackage{upquote} % gives straight quotes in verbatim
+
+\usepackage{titlesec}
+\titleformat{\section}{\bfseries \raggedright}{\thesection}{1em}{}
+
+\usepackage[colorlinks=true,urlcolor=black,linkcolor=black]{hyperref}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\fancyhead{}
+\fancyfoot{}
+\cfoot{\thepage{}~of~\pageref{LastPage}}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{Workflow for Generating a QIIME-compatible\\BLAST database from an ENTREZ search}
+\author{Chris Baker$^*$\\2 September 2016}
+\thanks{$^*$ \href{mailto:ccmbaker@princeton.edu}{ccmbaker@princeton.edu}. This PDF accompanies entrez$\_$qiime.py v1.0.}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy}
+
+This workflow allows you to take an input FASTA file generated from the NCBI database (e.g. through an Entrez search) and generate the files that you need to BLAST your data against those sequences through QIIME. These and other output files may also be useful for programs such as MEGAN.
+
+\section{NCBI taxonomy database files}
+\label{section:taxonomy}
+
+If you do not already have a local copy of the NCBI's taxonomy data, you will need to download it. On Odyssey, you can do it with the following commands:
+
+\begin{verbatim}
+    wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+    tar -zxvf taxdump.tar.gz
+    
+    wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/gi_taxid_nucl.dmp.gz
+    gunzip gi_taxid_nucl.dmp.gz
+\end{verbatim}
+
+The files you will need are called \verb|nodes.dmp|, \verb|names.dmp|, \verb|merged.dmp|, \verb|delnodes.dmp| and \linebreak \verb|gi_taxid_nucl.dmp|.
+
+Every sequence in GenBank is identified by a unique `GenBank ID' or GI. Each GI is associated with a TaxonID number, indicating the organism that the sequence comes from. These associations are listed in \verb|gi_taxid_nucl.dmp| for the nucleotide sequence database. (There are equivalent files for the other sequence databases, and you should download those instead if you intend to blast against sequences from one of those other databases.) Every node in the taxonomy database's tree-of-life has a unique TaxonID, but several sequences may share the same TaxonID e.g. if they come from the same species. To describe the topology of the tree, \verb|nodes.dmp| lists every TaxonID and, for each one, gives the TaxonID for the parent node. Finally, \verb|names.dmp| provides the taxonomic name for each node in the tree.
+
+\section{ENTREZ query}
+\label{section:entrez}
+
+Go to \url{http://www.ncbi.nlm.nih.gov/sites/gquery} and execute a search to obtain the sequences you ultimately want to BLAST against. For example, you might search for
+
+\begin{verbatim}
+    aftol AND "internal transcribed spacer 1"
+\end{verbatim}
+
+which (as at 1 June 2012) finds 710 Nucleotide results. Click on \verb|Nucleotide| to show these results. Then, at the top of the screen, click \verb|Send to:|. Select \verb|File|, then format \verb|FASTA|, then \verb|Create File|. The file should download as something like \verb|sequence.fasta|.
+
+The FASTA file that Entrez creates has deflines of the form
+
+\begin{verbatim}
+    >gi|######|...
+\end{verbatim}
+
+where \verb|######| is the unique GenBank ID (GI) for each sequence. (In fact, any FASTA file that fits this description can be used -- it need not be created by Entrez.) We will later modify these deflines to just read \verb|>######| in order to work with QIIME, as described in step~\ref{section:python} below.
+
+\section{Run entrez\_qiime.py}
+\label{section:python}
+
+The Python script \verb|entrez_qiime.py| takes the FASTA file and the three taxonomy files described above as inputs. From these it generates the following output files:
+\begin{itemize}
+	\item a copy of the FASTA file with the deflines stripped down to just the GI number;
+	\item a list of GIs in the FASTA file and their corresponding taxonomic names as semicolon delimited lists (this is the taxonomy mapping file that you need for QIIME);
+	\item a list of GIs in the FASTA file with their corresponding TaxonIDs;
+	\item a list of GIs in the FASTA file (may be useful for BLAST+ tools, if required);
+	\item a list of TaxonIDs for sequences in the FASTA file, with their corresponding taxonomic names as semicolon delimited lists (only if requested with the \verb|-t| option).
+\end{itemize}
+
+On Odyssey, you can run the script as follow:
+
+% note that "module load bio/qiime-1.5.0" can replace the first three lines here
+\begin{verbatim}
+    module load hpc/python-2.7.1    
+    module load hpc/numpy-1.6.0_python-2.7.1
+    module load bio/pycogent-1.5.1
+    python entrez_qiime.py [options]
+\end{verbatim}
+
+where the options are the following:
+
+\begin{longtable}{@{} p{1.4in} p{5.35in} @{}} % Column formatting, @{} suppresses leading/trailing space
+      \verb|-i|, \verb|--inputfasta| & The path, including filename, of the input FASTA file. Filename should have an extension, as it will be used as the basis for output file names. \mbox{[Required]} \\
+      \verb|-o|, \verb|--outputdir| & The directory where output files should be saved. Will be created if it does not exist. \mbox{[Default:~./]} \\
+      \verb|-f|, \verb|--force| & If -f or --force option are passed, output files will overwrite any existing files with the same names. Without this option, output filenames will be modified by the addition of a date/time string in the event that a file with the same name already exists. \mbox{[Default:~False]} \\
+      \verb|-n|, \verb|--nodes| & The directory where the files nodes.dmp, names.dmp, merged.dmp and delnodes.dmp are located. The files are typically downloaded from the NCBI in the compressed archive taxdump.tar.gz. \mbox{[Default: ./]} \\
+      \verb|-g|, \verb|--gitaxid| & The path, including filename, of the (uncompressed) input gi-taxid file e.g. from the nt database dump, typically downloaded from the NCBI as gi\_taxid\_nucl.dmp.gz and uncompressed to gi\_taxid\_nucl.dmp. \mbox{[Default:~./gi\_taxid\_nucl.dmp]} \\
+      \verb|-r|, \verb|--ranks|  & A comma-separated list (no spaces) of the taxonomic ranks you want to keep in the taxon names output. Ranks can be provided in any order, but names output will be generated in that order, so should typically be in descending order. Any taxonomic names assigned to one of the ranks in the list will be retained; other names will be discarded. If a taxon has no name for one of the ranks in the list, then NA will be inserted in the output. No sequences or taxa will be discarded -- this option only affects the names that are output for each taxon or sequence.The following ranks are available in the NCBI taxonomy database as at 2~June~2012 (in alphabetical order): class, family, forma, genus, \mbox{infraclass}, \linebreak
+\end{longtable}
+
+\begin{longtable}{@{} p{1.4in} p{5.35in} @{}} % Column formatting, @{} suppresses leading/trailing space
+      &  \mbox{infraorder}, kingdom, no\_rank, order, parvorder, phylum, species, species\_group, species\_subgroup, subclass, subfamily, subgenus, \mbox{subkingdom}, \mbox{suborder}, \mbox{subphylum}, subspecies, subtribe, superclass, superfamily, \mbox{superkingdom}, \mbox{superorder}, superphylum, tribe, varietas. Note the use of underscores in three of the names. You should include these on the command line but they will be replaced by spaces when the script runs so that the names match the NCBI ranks. \mbox{[Default:~phylum,class,order,family,genus,species]} \\
+      \verb|-t|, \verb|--taxid| & If -t or --taxid are passed, an additional output file will be generated that lists taxonomy for each TaxonID.  \mbox{[Default:~False]}	\\
+      \verb|-h|, \verb|--help| & Print this help information.
+\end{longtable}
+
+The script automatically generates output filenames. Given the input FASTA file \verb|somepath/file.extn|, the script will save files \verb|file_stripped.extn|, \verb|file_gi_taxonomy.txt|, \verb|file_gi_taxid.txt| and \linebreak \verb|file_gi.txt| in the output directory passed to \verb|-o|. It will also generate \verb|file_taxid_taxonomy.txt| in the same directory if the option \verb|-t| is passed. If these filenames conflict with any existing files, then those existing files will be overwritten if \verb|-f| is passed, or the output filenames will be modified by the addition of a date-time string otherwise.
+
+Sometimes the script may encounter small discrepancies between the various input files. For example, your input FASTA file may contain GIs with outdated TaxonIDs in \verb|gi_taxid_nucl.dmp| if two taxa have been merged. Or your FASTA file may contain sequences that have only recently been uploaded to GenBank and have not yet made it into \verb|gi_taxid_nucl.dmp|. \verb|entrez_qiime.py| can deal with some of these discrepancies, and any changes that are made are documented in a log file saved in the output directory alongside the other outputs.
+
+%The script is written to trap some errors, but it is far from error-proof. For example, it should detect missing input files, but if you supply a path to a file of the wrong kind, it will probably just try to work with that file and produce nonsensical output.
+
+The script will take several minutes to run, even with a small input FASTA file, since it takes some time to load the NCBI's taxonomy data. Running time increases with the size of the input FASTA file.
+
+\section{Generate BLAST database}
+\label{section:blast}
+
+Now we want to generate a BLAST-formatted database from the FASTA file with the stripped-down \mbox{deflines}, i.e. the output from \verb|entrez_qiime.py|, not the version originally downloaded from Entrez. (Actually, you might be able to skip this step if you are just using QIIME -- see step~\ref{section:qiime} below.)
+
+If the FASTA file output by \verb|entrez_qiime.py| is saved as \verb|somepath/sequence_stripped.fasta|, you can generate the BLAST database on Odyssey with the following code:
+
+\begin{verbatim}
+    module load bio/ncbi-blast-2.2.25+
+
+    makeblastdb \
+    -in somepath/sequence_stripped.fasta \
+    -dbtype nucl \
+    -title 'a title for your database' \
+    -out yourblastdbpath/yourblastdbname \
+    -max_file_sz '1GB'
+\end{verbatim}
+
+This will save a handful of files called \verb|yourblastdbpath/yourblastdbname.???| that together comprise the sequences in your FASTA file, but formatted appropriately for BLAST. You could now BLAST against that database using any of the usual BLAST command line tools, such as \verb|blastall|. You can give the database any title you want, and it may be useful to be fairly descriptive. The name \verb|yourblastdbname| is used in naming the output files, and will also be used later to refer other programs (like QIIME or \verb|blastall|) to your database, just like you might use \verb|nt| or \verb|nr| to refer to the entire nucleotide database, so it is probably useful to keep that name short.
+
+%\pagebreak
+\section{Run BLAST search in QIIME}
+\label{section:qiime}
+
+You should now have all the files you need to BLAST against the sequences you obtained through your Entrez search using QIIME. To ensure that QIIME can find your new BLAST database, you can use some code like this on Odyssey:
+
+\begin{verbatim}
+    module load bio/qiime-1.5.0
+\end{verbatim}
+\begin{verbatim}
+    BLASTDB_OLD=$BLASTDB
+    BLASTDB=yourblastdbpath/
+
+    assign_taxonomy.py \
+    -i your454data.fasta \
+    -t outputdir/sequence_gi_taxonomy.txt \
+    -m blast \
+    -b yourblastdbname
+
+    BLASTDB=$BLASTDB_OLD
+    unset BLASTDB_OLD
+\end{verbatim}
+
+The file \verb|outputdir/sequence_gi_taxonomy.txt| is one of the output files from \verb|entrez_qiime.py|, and will be located in the output directory that you specified.
+
+You may be able to skip step~\ref{section:blast} above if you replace the option \verb|-b yourblastdbname| with the option \verb|-r somepath/sequence_stripped.fasta|, thus providing the output FASTA file directly to QIIME. In this case, you should not need to change the environmental variables \verb|$BLASTDB_OLD| and \verb|$BLASTDB|. QIIME should format the BLAST database for you and go on to execute the BLAST search as usual.
+
+\end{document}  
