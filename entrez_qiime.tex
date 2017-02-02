@@ -26,8 +26,8 @@
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
 \title{Workflow for Generating a QIIME-compatible\\BLAST database from an NCBI ENTREZ/gquery search}
-\author{Chris Baker$^*$\\ \\7 October 2016}
-\thanks{$^*$ Department of Ecology and Evolutionary Biology, Princeton University. Email:~\href{mailto:ccmbaker@princeton.edu}{ccmbaker@princeton.edu}. This PDF accompanies entrez$\_$qiime.py v2.0. This update has been written to accession numbers instead of GI numbers in the input files. For older input files with GI numbers, see v1.0 of this workflow.}
+\author{Chris Baker$^*$\\ \\2 February 2017}
+\thanks{$^*$ Department of Ecology and Evolutionary Biology, Princeton University. Email:~\href{mailto:ccmbaker@princeton.edu}{ccmbaker@princeton.edu}. This PDF accompanies entrez$\_$qiime.py v2.0. This update has been written to accession.version numbers instead of GI numbers in the input files. For older input files with GI numbers, see v1.0 of this workflow.}
 
 \begin{document}
 
@@ -35,7 +35,7 @@
 
 \thispagestyle{fancy}
 
-This document describes how to take a FASTA file, plus the NCBI taxonomy database, and generate the id-to-taxonomy mapping file that you need to BLAST your metabarcode data against the FASTA file sequences using QIIME. The Python code described in Section~\ref{section:python} relies on being able to extract NCBI accession numbers (not GI numbers) from your input FASTA file to match against the taxonomy database, so the FASTA file needs to be correctly formatted. The code is designed to work with FASTA files downloaded from the NCBI database (e.g. through a gquery search), but should work fine as long as your FASTA file contains appropriate accession numbers formatted in the same way.
+This document describes how to take a FASTA file, plus the NCBI taxonomy database, and generate the id-to-taxonomy mapping file that you need to BLAST your metabarcode data against the FASTA file sequences using QIIME. The Python code described in Section~\ref{section:python} relies on being able to extract NCBI accession.version numbers (not GI numbers) from your input FASTA file to match against the taxonomy database, so the FASTA file needs to be correctly formatted. The code is designed to work with FASTA files downloaded from the NCBI database (e.g. through a gquery search), but should work fine as long as your FASTA file contains appropriate accession.version numbers formatted in the same way.
 
 \section{Obtain FASTA file of sequences to BLAST against}
 \label{section:gquery}
@@ -56,9 +56,9 @@ The FASTA file that gquery creates for nucleotide sequences has deflines of the 
 
 where \verb|XX######.#| is the NCBI accession.version number that uniquely identifies this sequence, and this is separated by a space from any other information on the defline.
 
-Any FASTA file that fits this format can be used with the Python script \verb|entrez_qiime.py| described in Section~\ref{section:python} below. i.e. the file need not be created by gquery, so feel free to obtain it from other sources, as long as each sequence has a suitable accession number. Any additional information on the defline is ignored by \verb|entrez_qiime.py|, as is the sequence data itself -- so you could, for example, download a file of sequences and annotate it or delete irrelevant portions of the file before running it through the rest of this workflow.
+Any FASTA file that fits this format can be used with the Python script \verb|entrez_qiime.py| described in Section~\ref{section:python} below. i.e. the file need not be created by gquery, so feel free to obtain it from other sources, as long as each sequence has a suitable accession.version number. Any additional information on the defline is ignored by \verb|entrez_qiime.py|, as is the sequence data itself -- so you could, for example, download a file of sequences and annotate it or delete irrelevant portions of the file before running it through the rest of this workflow.
 
-Note that, as an alternative to a FASTA file, \verb|entrez_qiime.py| will also take a plain list of accession numbers using its \verb|-L| option, one per line:
+Note that, as an alternative to a FASTA file, \verb|entrez_qiime.py| will also take a plain list of accession.version numbers using its \verb|-L| option, one per line:
 
 \begin{verbatim}
     XX######.#
@@ -67,7 +67,7 @@ Note that, as an alternative to a FASTA file, \verb|entrez_qiime.py| will also t
        ...
 \end{verbatim}
 
-This might be useful if you already have a BLAST sequence database and have a list of the accession numbers for the sequences (perhaps because you used that list to filter or mask a larger database).
+This might be useful if you already have a BLAST database and have a list of the accession.version numbers for the sequences (perhaps because you used that list to filter or mask a larger database).
 
 \section{NCBI taxonomy database files}
 \label{section:taxonomy}
@@ -86,12 +86,12 @@ If you do not already have a local copy of the NCBI's taxonomy data, you will ne
 
 The files you will need from \verb|taxdump.tar.gz| are \verb|nodes.dmp|, \verb|names.dmp|, \verb|merged.dmp| and \verb|delnodes.dmp|. The other file, \verb|nucl_gb.accession2taxid.gz|, should unzip to \verb|nucl_gb.accession2taxid|.
 
-Every sequence in GenBank is identified by a unique accession number. Each accession number is associated with a TaxonID number, indicating the organism that the sequence comes from. These associations are listed in \verb|nucl_gb.accession2taxid| for nucleotide sequences (excluding EST, GSS, WGS or TSA nucleotide sequences -- these are covered by the analogous files \verb|nucl_est.accession2taxid.gz|, \verb|nucl_gss.accession2taxid.gz|, \verb|nucl_wgs.accession2taxid.gz| and \verb|nucl_gb.accession2taxid.gz|, and you should download those files instead if appropriate for your gquery data). Every node in the taxonomy database's tree-of-life has a unique TaxonID, but several sequences may share the same TaxonID e.g. if they come from the same species. To describe the topology of the tree, \verb|nodes.dmp| lists every TaxonID and, for each one, gives the TaxonID for the parent node. Finally, \verb|names.dmp| provides the taxonomic name for each node in the tree.
+Every sequence in GenBank is identified by a unique accession.version number. Each accession.version number is associated with a TaxonID number, indicating the organism that the sequence comes from. These associations are listed in \verb|nucl_gb.accession2taxid| for nucleotide sequences (excluding EST, GSS, WGS or TSA nucleotide sequences -- these are covered by the analogous files \verb|nucl_est.accession2taxid.gz|, \verb|nucl_gss.accession2taxid.gz|, \verb|nucl_wgs.accession2taxid.gz| and \verb|nucl_gb.accession2taxid.gz|, and you should download those files instead if appropriate for your gquery data). Every node in the taxonomy database's tree-of-life has a unique TaxonID, but several sequences may share the same TaxonID e.g. if they come from the same species. To describe the topology of the tree, \verb|nodes.dmp| lists every TaxonID and, for each one, gives the TaxonID for the parent node. Finally, \verb|names.dmp| provides the taxonomic name for each node in the tree.
 
 \section{Run entrez\_qiime.py}
 \label{section:python}
 
-The Python script \verb|entrez_qiime.py| takes your FASTA file (or accession number list) and the five taxonomy files described above as inputs. From these the script generates the accession-to-taxonomy file required by QIIME's \verb|assign_taxonomy.py|, with each line containing an accession number separated by a tab from a semicolon-delimited list of taxonomic names for that accession:
+The Python script \verb|entrez_qiime.py| takes your FASTA file (or accession.version number list) and the five taxonomy files described above as inputs. From these the script generates the accession-to-taxonomy file required by QIIME's \verb|assign_taxonomy.py|, with each line containing an accession.version number separated by a tab from a semicolon-delimited list of taxonomic names for that sequence:
 
 \begin{verbatim}
     XX######.#    phylum;class;order;family;genus;species
@@ -112,8 +112,8 @@ On my Mac, you can run the script as follows\footnote{My laptop has Python 2.7.1
 where the options are the following:
 
 \begin{longtable}{@{} p{1.4in} p{5.35in} @{}}
-      \verb|-i|, \verb|--inputfasta| & The path, including filename, of an input FASTA file with accession number deflines as described in Section~\ref{section:gquery}. [Required, unless an accession number list is supplied with \verb|-L| or \verb|--List|. If both are supplied, the script fails.] \\
-      \verb|-L|, \verb|--List| & The path, including filename, of an input accession number list, one accession number per line as described in Section~\ref{section:gquery}, as an alternative to supplying a FASTA file. [Required, unless a FASTA file is supplied with \verb|-i| or \verb|--inputfasta|. If both are supplied, the script fails.] \\
+      \verb|-i|, \verb|--inputfasta| & The path, including filename, of an input FASTA file with accession.version number deflines as described in Section~\ref{section:gquery}. [Required, unless an accession.version number list is supplied with \verb|-L| or \verb|--List|. If both are supplied, the script fails.] \\
+      \verb|-L|, \verb|--List| & The path, including filename, of an input accession.version number list, one accession.version number per line as described in Section~\ref{section:gquery}, as an alternative to supplying a FASTA file. [Required, unless a FASTA file is supplied with \verb|-i| or \verb|--inputfasta|. If both are supplied, the script fails.] \\
       \verb|-o|, \verb|--outputfile| & The path, including filename, for the accession-to-taxonomy output file as required by QIIME. Will be created if it does not exist. Defaults to same directory as input FASTA or list file, with file name derived from the input file's name, if not supplied here. \\
       \verb|-g|, \verb|--outputlog| & The path, including filename, for the output log file. Will be created if it does not exist. Defaults to same directory as input FASTA or list file, with file name derived from the input file's name, if not supplied here. \\
       \verb|-f|, \verb|--force| & If \verb|-f| or \verb|--force| option are passed, output files will overwrite any existing files with the same names. Without this option, output filenames will be modified by the addition of a date/time string in the event that a file with the same name already exists, so that no files will be overwritten. [Default: False] \\
@@ -125,9 +125,9 @@ where the options are the following:
 
 The two output files will be saved wherever you specify with arguments \verb|-o| and \verb|-g|. If these arguments are not supplied, files will be saved in the same directory as the input FASTA or list file supplied with \verb|-i| or \verb|-L|. In this case, given the input file \verb|somepath/filename.extn|, output files \verb|somepath/filename_accession| \verb|_taxonomy.txt| and \verb|somepath/filename.log| will be saved. If these filenames conflict with any existing files, then the output filenames will be modified by the addition of a date-time string, unless \verb|-f| is passed in which case those existing files will be overwritten.
 
-Sometimes the script may encounter small discrepancies between the various input files. For example, your input FASTA file may contain accession numbers with outdated TaxonIDs in \verb|nucl_gb.accession2taxid| if two taxa have been merged. Or your FASTA file may contain sequences that have only recently been uploaded to GenBank and have not yet made it into \verb|nucl_gb.accession2taxid|. Check the log file for details of any changes made to deal with such discrepancies.
+Sometimes the script may encounter small discrepancies between the various input files. For example, your input FASTA file may contain accession.version numbers with outdated TaxonIDs in \verb|nucl_gb.accession2taxid| if two taxa have been merged. Or your FASTA file may contain sequences that have only recently been uploaded to GenBank and have not yet made it into \verb|nucl_gb.accession2taxid|. Check the log file for details of any changes made to deal with such discrepancies.
 
-The script will take several minutes to run, even with a small input FASTA file, since it takes some time to load the NCBI's taxonomy data. Running time also increases with the size of the input FASTA file.
+The script will take several minutes to run, even with a small input FASTA file, since it takes some time to load the NCBI's taxonomy data. Run time also increases with the size of the input FASTA file.
 
 \section{Generate BLAST database}
 \label{section:blast}
