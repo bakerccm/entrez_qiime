@@ -10,7 +10,7 @@
 # of GI numbers, was written while the author was in the Pringle and Tarnita Labs,
 # Department of Ecology and Evolutionary Biology, Princeton University
 
-# Last modified: 7 October 2016
+# Last modified: 4 April 2017
 
 #################################################
 
@@ -242,6 +242,14 @@ def output_files():
         # if supplied logfile filepath is not an existing directory, then use it for output logfile
         logfile_path = args.logfile_path
     
+    # Try to deal with relative paths
+   
+    if not os.path.dirname(outfile_path):
+        outfile_path = './' + outfile_path
+    
+    if not os.path.dirname(logfile_path):
+        logfile_path = './' + logfile_path
+
     # Check that directories for output files exist, otherwise create them.
     
     if not os.path.exists(os.path.dirname(outfile_path)):
@@ -268,6 +276,13 @@ def output_files():
         if os.path.isfile(logfile_path):
             logfile_path = os.path.splitext(logfile_path)[0] + '_' + timestamp + os.path.splitext(logfile_path)[1]
             
+    # Checks that the output file and log file aren't the same file. If they are, append different extensions.
+    
+    if outfile_path == outfile_path:
+        print "yes"
+        outfile_path = outfile_path + '.txt'
+        logfile_path = logfile_path + '.log'
+
     # Initiate log file.
     
     log_file = open(logfile_path, 'w')
@@ -292,6 +307,7 @@ def get_accessions_from_input_file():
         for curr_line in input_file:
             if curr_line[0] == '>':
                 curr_line_accession = curr_line.split(' ',1)[0][1:]
+                curr_line_accession = curr_line_accession.rstrip()
                 included_accessions[curr_line_accession] = True
         
     else:
@@ -299,7 +315,7 @@ def get_accessions_from_input_file():
         input_file = open(args.infile_list_path, 'r')
         
         for curr_line in input_file:
-            curr_line_accession = curr_line.strip()
+            curr_line_accession = curr_line.rstrip()
             if curr_line_accession:
                 included_accessions[curr_line_accession] = True
     
