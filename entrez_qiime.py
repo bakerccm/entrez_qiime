@@ -278,7 +278,7 @@ def output_files():
             
     # Checks that the output file and log file aren't the same file. If they are, append different extensions.
     
-    if outfile_path == outfile_path:
+    if outfile_path == logfile_path:
         outfile_path = outfile_path + '.txt'
         logfile_path = logfile_path + '.log'
 
