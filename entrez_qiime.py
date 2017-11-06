@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Author: Chris Baker
-# Email: ccmbaker@princeton.edu
+# Email:  ccmbaker@fas.harvard.edu
 
 # The original version of this script was written while the author was in the
 # Pierce Lab, Department of Organismic and Evolutionary Biology, Harvard University
@@ -10,7 +10,7 @@
 # of GI numbers, was written while the author was in the Pringle and Tarnita Labs,
 # Department of Ecology and Evolutionary Biology, Princeton University
 
-# Last modified: 4 April 2017
+# Last modified: 6 November 2017
 
 #################################################
 

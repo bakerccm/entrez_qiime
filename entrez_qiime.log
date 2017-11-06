@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  2 FEB 2017 10:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  6 NOV 2017 09:55
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -543,7 +543,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 211.
 Here is how much of TeX's memory you used:
  7408 strings out of 493089
  105228 string characters out of 6134842
- 215633 words of memory out of 5000000
+ 215638 words of memory out of 5000000
  10615 multiletter control sequences out of 15000+600000
  11121 words of font info for 44 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
@@ -555,7 +555,7 @@ r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/l
 ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/loc
 al/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/loca
 l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on entrez_qiime.pdf (5 pages, 118324 bytes).
+Output written on entrez_qiime.pdf (5 pages, 118630 bytes).
 PDF statistics:
  103 PDF objects out of 1000 (max. 8388607)
  88 compressed objects within 1 object stream
