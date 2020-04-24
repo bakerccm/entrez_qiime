@@ -1,1 +1,4 @@
 theme: jekyll-theme-slate
+
+title: "entrez_qiime"
+description: "A utility to generate an id-to-taxonomy mapping file for taxonomy assignment using BLAST in QIIME"
