@@ -1,7 +1,3 @@
-# entrez_qiime
-
-A utility to generate an id-to-taxonomy mapping file for taxonomy assignment using BLAST in QIIME
-
 - GitHub repository: [https://github.com/bakerccm/entrez_qiime](https://github.com/bakerccm/entrez_qiime)
 
 Latest release: [https://github.com/bakerccm/entrez_qiime/releases/tag/v2.0](https://github.com/bakerccm/entrez_qiime/releases/tag/v2.0)
