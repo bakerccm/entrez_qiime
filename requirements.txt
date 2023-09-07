@@ -1,0 +1,9 @@
+chardet==5.2.0
+cogent3==2023.7.18a1
+llvmlite==0.40.1
+numba==0.57.1
+numpy==1.24.4
+scipy==1.11.2
+scitrack==2021.5.3
+tqdm==4.66.1
+typing_extensions==4.7.1
