@@ -21,9 +21,9 @@ from time import strftime
 from time import localtime
 from sys import exit
 
-from cogent.parse.ncbi_taxonomy import NcbiTaxonomyFromFiles
-from cogent.parse.ncbi_taxonomy import NcbiTaxonNode
-from cogent.core.tree import TreeNode
+from cogent3.parse.ncbi_taxonomy import NcbiTaxonomyFromFiles
+from cogent3.parse.ncbi_taxonomy import NcbiTaxonNode
+from cogent3.core.tree import TreeNode
 
 #################################################
 
@@ -189,7 +189,7 @@ def input_files():
         if not os.path.isfile(args.infile_list_path):
             exit('Error: cannot find input accession number list at ' + args.infile_list_path)
     else:
-        print "Need to supply either FASTA file or accession number list as input."    # should never get here because either -i or -L is a required argument.
+        print("Need to supply either FASTA file or accession number list as input.")    # should never get here because either -i or -L is a required argument.
 
     if not os.path.isfile(args.infile_acc2taxid_path):
         exit('Error: cannot find input accession number - TaxonID file at ' + args.infile_acc2taxid_path)
@@ -455,12 +455,12 @@ def generate_taxonid_taxonomy(included_nodes, ncbi_full_taxonomy, output_ranks):
         while lineage_complete is False:
             if curr.Rank in ranks_lookup:
                 lineage[ranks_lookup[curr.Rank]] = curr.Name
-            curr = curr.Parent
+            curr = curr.parent
             if curr is None:
                 lineage_complete = True
             elif curr.TaxonId in taxid_taxonomy:
                 for level in range(0,len(lineage)):
-                    if (taxid_taxonomy[curr.TaxonId][level] is not 'NA') and (lineage[level] is 'NA'):
+                    if (taxid_taxonomy[curr.TaxonId][level] != 'NA') and (lineage[level] == 'NA'):
                         lineage[level] = taxid_taxonomy[curr.TaxonId][level]
                 lineage_complete = True
         taxid_taxonomy[node.TaxonId] = lineage
